@@ -259,6 +259,9 @@ class HTMLExperienceView extends FileView {
 			}, { passive: false });
 
 			this._messageHandler = (evt: MessageEvent) => {
+				// Every view listens on the same window; only handle messages
+				// sent by this view's own iframe.
+				if (!this.iframe || evt.source !== this.iframe.contentWindow) return;
 				const data: { type: string; deltaY?: number; url?: string } = evt.data;
 				if (data.type === "html-experience-zoom") {
 					if ((data.deltaY ?? 0) < 0) {

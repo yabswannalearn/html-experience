@@ -254,6 +254,7 @@ var HTMLExperienceView = class extends import_obsidian.FileView {
       }, { passive: false });
       this._messageHandler = (evt) => {
         var _a;
+        if (!this.iframe || evt.source !== this.iframe.contentWindow) return;
         const data = evt.data;
         if (data.type === "html-experience-zoom") {
           if (((_a = data.deltaY) != null ? _a : 0) < 0) {
