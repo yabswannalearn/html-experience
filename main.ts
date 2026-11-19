@@ -64,6 +64,10 @@ class HTMLExperienceView extends FileView {
 	}
 
 	async onLoadFile(file: TFile): Promise<void> {
+		// The view can be reloaded without onUnloadFile() running first
+		// (reloadViewsForFile, reloadActiveView), so drop the previous
+		// listener here; otherwise every reload adds one more.
+		this.removeMessageHandler();
 		this.contentEl.empty();
 
 		try {
@@ -255,6 +259,9 @@ class HTMLExperienceView extends FileView {
 			}, { passive: false });
 
 			this._messageHandler = (evt: MessageEvent) => {
+				// Every view listens on the same window; only handle messages
+				// sent by this view's own iframe.
+				if (!this.iframe || evt.source !== this.iframe.contentWindow) return;
 				const data: { type: string; deltaY?: number; url?: string } = evt.data;
 				if (data.type === "html-experience-zoom") {
 					if ((data.deltaY ?? 0) < 0) {
@@ -518,6 +525,10 @@ class HTMLExperienceView extends FileView {
 	}
 
 	async onUnloadFile(): Promise<void> {
+		this.removeMessageHandler();
+	}
+
+	removeMessageHandler(): void {
 		if (this._messageHandler) {
 			window.removeEventListener("message", this._messageHandler);
 			this._messageHandler = null;

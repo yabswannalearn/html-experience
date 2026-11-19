@@ -72,6 +72,7 @@ var HTMLExperienceView = class extends import_obsidian.FileView {
     return ["html", "htm", "mht", "mhtml"].includes(extension);
   }
   async onLoadFile(file) {
+    this.removeMessageHandler();
     this.contentEl.empty();
     try {
       const contents = await this.app.vault.readBinary(file);
@@ -253,6 +254,7 @@ var HTMLExperienceView = class extends import_obsidian.FileView {
       }, { passive: false });
       this._messageHandler = (evt) => {
         var _a;
+        if (!this.iframe || evt.source !== this.iframe.contentWindow) return;
         const data = evt.data;
         if (data.type === "html-experience-zoom") {
           if (((_a = data.deltaY) != null ? _a : 0) < 0) {
@@ -493,6 +495,9 @@ var HTMLExperienceView = class extends import_obsidian.FileView {
     return false;
   }
   async onUnloadFile() {
+    this.removeMessageHandler();
+  }
+  removeMessageHandler() {
     if (this._messageHandler) {
       window.removeEventListener("message", this._messageHandler);
       this._messageHandler = null;
