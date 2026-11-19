@@ -72,6 +72,7 @@ var HTMLExperienceView = class extends import_obsidian.FileView {
     return ["html", "htm", "mht", "mhtml"].includes(extension);
   }
   async onLoadFile(file) {
+    this.removeMessageHandler();
     this.contentEl.empty();
     try {
       const contents = await this.app.vault.readBinary(file);
@@ -493,6 +494,9 @@ var HTMLExperienceView = class extends import_obsidian.FileView {
     return false;
   }
   async onUnloadFile() {
+    this.removeMessageHandler();
+  }
+  removeMessageHandler() {
     if (this._messageHandler) {
       window.removeEventListener("message", this._messageHandler);
       this._messageHandler = null;

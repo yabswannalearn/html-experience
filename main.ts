@@ -64,6 +64,10 @@ class HTMLExperienceView extends FileView {
 	}
 
 	async onLoadFile(file: TFile): Promise<void> {
+		// The view can be reloaded without onUnloadFile() running first
+		// (reloadViewsForFile, reloadActiveView), so drop the previous
+		// listener here; otherwise every reload adds one more.
+		this.removeMessageHandler();
 		this.contentEl.empty();
 
 		try {
@@ -518,6 +522,10 @@ class HTMLExperienceView extends FileView {
 	}
 
 	async onUnloadFile(): Promise<void> {
+		this.removeMessageHandler();
+	}
+
+	removeMessageHandler(): void {
 		if (this._messageHandler) {
 			window.removeEventListener("message", this._messageHandler);
 			this._messageHandler = null;
